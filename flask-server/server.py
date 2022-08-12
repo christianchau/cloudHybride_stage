@@ -128,13 +128,27 @@ def offre():
     cursor.execute("SELECT * FROM offre")
     Offres = cursor.fetchall()
     print(Offres)
+    print("Total rows are:  ", len(Offres))
+    for row in Offres:
+        print(row)
+        response_body = {
+            "name": row[1],
+            "type" : row[2],
+            "description": row[3],
+            "datedebut": row[4],
+            "duree": row[5],
+            "address": row[8],
+            "ville": row[9],          
+            "prix": row[11]
+        }
+    print(response_body)
+    return response_body
     """
     for i in range(len(Offres)):
         for j in range(len(Offres[i])):
             Offer = Offres[i][j]
             print(Offer)
     return 'hello'
-    """
     response_body = {
         "name": Offres[0][1],
         "type" : Offres[0][2],
@@ -146,6 +160,7 @@ def offre():
         "prix": Offres[0][11]
     }
     return response_body
+    """
 
 ##### Fournisseur Part #####
 @app.route('/register_f', methods =["GET", "POST"])

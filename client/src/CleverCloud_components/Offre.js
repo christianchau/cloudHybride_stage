@@ -85,15 +85,6 @@ default export function Offres() {
             <p key={i}>{offre}</p>
           ))
         )}
-        <div>
-        {(typeof data.livres === 'undefined') ? (
-          <p>Loading...</p>
-        ) : (
-          data.livres.map((offre, i) => (
-            <p key={i}>{offre}</p>
-          ))
-        )}
-        </div>
     </div>
 
   )
