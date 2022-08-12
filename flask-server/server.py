@@ -53,6 +53,11 @@ def refresh_expiring_jwts(response):
         # Case where there is not a valid JWT. Just return the original respone
         return response
 
+@app.route("/")
+def hello():
+    return "<h1 style='color:blue'>Hello There!</h1>"
+
+
 @app.route('/token', methods=["POST", "GET"])
 def create_token_user():
     email = request.json.get("email", None)
