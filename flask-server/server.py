@@ -13,28 +13,27 @@ from argon2 import PasswordHasher
 load_dotenv()
 ph = PasswordHasher()
 
+
+HOST = os.getenv('POSTGRESQL_ADDON_HOST')
+DATABASE = os.getenv('POSTGRESQL_ADDON_DB')
+DATABASE_USERNAME = os.getenv('POSTGRESQL_ADDON_USER')
+DATABASE_PASSWORD = os.getenv('POSTGRESQL_ADDON_PASSWORD')
+"""
 HOST = os.getenv('HOST')
 DATABASE = os.getenv('DATABASE')
 DATABASE_USERNAME = os.getenv('DATABASE_USERNAME')
 DATABASE_PASSWORD = os.getenv('DATABASE_PASSWORD')
-
+"""
 app = Flask(__name__)
 
 # CORS implemented so that we don't get errors when trying to access the server from a different server location
 CORS(app)
 
 conn = psycopg2.connect(
-    POSTGRESQL_ADDON_HOST,
-    POSTGRESQL_ADDON_DB,
-    POSTGRESQL_ADDON_USER,
-    POSTGRESQL_ADDON_PASSWORD)
-"""
-conn = psycopg2.connect(
         host=HOST,
         database=DATABASE,
         user=DATABASE_USERNAME,
         password=DATABASE_PASSWORD)
-"""
 print(conn)
 
 cursor = conn.cursor()
