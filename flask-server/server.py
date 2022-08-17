@@ -24,11 +24,19 @@ app = Flask(__name__)
 CORS(app)
 
 conn = psycopg2.connect(
+    POSTGRESQL_ADDON_HOST,
+    POSTGRESQL_ADDON_DB,
+    POSTGRESQL_ADDON_USER,
+    POSTGRESQL_ADDON_PASSWORD)
+"""
+conn = psycopg2.connect(
         host=HOST,
         database=DATABASE,
         user=DATABASE_USERNAME,
         password=DATABASE_PASSWORD)
+"""
 print(conn)
+
 cursor = conn.cursor()
 
 app.config["JWT_SECRET_KEY"] = secrets.token_hex(16)
