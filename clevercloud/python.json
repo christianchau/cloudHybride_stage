@@ -1,0 +1,8 @@
+{
+    "build": {
+        "folder": "flask-server"
+    },
+    "deploy": {
+        "module": "server:app"
+    }
+}
