@@ -18,6 +18,7 @@ HOST = os.getenv('POSTGRESQL_ADDON_HOST')
 DATABASE = os.getenv('POSTGRESQL_ADDON_DB')
 DATABASE_USERNAME = os.getenv('POSTGRESQL_ADDON_USER')
 DATABASE_PASSWORD = os.getenv('POSTGRESQL_ADDON_PASSWORD')
+PORT = os.getenv('POSTGRESQL_ADDON_PORT')
 """
 HOST = os.getenv('HOST')
 DATABASE = os.getenv('DATABASE')
@@ -33,7 +34,8 @@ conn = psycopg2.connect(
         host=HOST,
         database=DATABASE,
         user=DATABASE_USERNAME,
-        password=DATABASE_PASSWORD)
+        password=DATABASE_PASSWORD,
+        port=PORT)
 print(conn)
 
 cursor = conn.cursor()
