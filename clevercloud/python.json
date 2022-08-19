@@ -3,6 +3,6 @@
         "folder": "flask-server"
     },
     "deploy": {
-        "module": "server:app"
+        "module": "wsgi:application"
     }
 }
