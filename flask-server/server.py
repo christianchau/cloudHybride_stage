@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from urllib import response
 from datetime import datetime, timedelta, timezone
 from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, \
@@ -35,7 +35,7 @@ conn = psycopg2.connect(
         database=DATABASE,
         user=DATABASE_USERNAME,
         password=DATABASE_PASSWORD,
-        port=PORT)
+        port=PORT,)
 print(conn)
 
 cursor = conn.cursor()
@@ -65,6 +65,11 @@ def refresh_expiring_jwts(response):
 @app.route("/")
 def hello():
     return "<h1 style='color:blue'>Hello There!</h1>"
+
+@app.route("/test")
+def test():
+    test_value = ["1", "2", "3"]
+    return test_value
 
 
 @app.route('/token', methods=["POST", "GET"])

@@ -1,0 +1,16 @@
+{
+    "Id": "Policy1587216857769",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1587216727444",
+        "Action": [
+          "s3:GetObject"
+        ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::frontend_hybride_cloud.com/*",
+        "Principal": "*"
+      }
+    ]
+  }
+  

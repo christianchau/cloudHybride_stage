@@ -17,6 +17,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "client-s3-deploy": "s3cmd sync build/* s3://frontend_hybride_cloud.com --acl-public",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

@@ -19,9 +19,8 @@ body{
 
 
 button {
-  left: 40%;
   position: relative;
-  display:block;
+  /*display:block;*/
   height: 50px;
   width: 120px;
   margin: 10px 7px;
