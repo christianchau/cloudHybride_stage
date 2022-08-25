@@ -66,12 +66,6 @@ def refresh_expiring_jwts(response):
 def hello():
     return "<h1 style='color:blue'>Hello There!</h1>"
 
-@app.route("/test")
-def test():
-    test_value = ["1", "2", "3"]
-    return test_value
-
-
 @app.route('/token', methods=["POST", "GET"])
 def create_token_user():
     email = request.json.get("email", None)
