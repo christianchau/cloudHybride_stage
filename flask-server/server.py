@@ -25,7 +25,7 @@ DATABASE = os.getenv('DATABASE')
 DATABASE_USERNAME = os.getenv('DATABASE_USERNAME')
 DATABASE_PASSWORD = os.getenv('DATABASE_PASSWORD')
 """
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../client/build', static_url_path='/')
 
 # CORS implemented so that we don't get errors when trying to access the server from a different server location
 CORS(app)
@@ -63,8 +63,8 @@ def refresh_expiring_jwts(response):
         return response
 
 @app.route("/")
-def hello():
-    return "<h1 style='color:blue'>Hello There!</h1>"
+def index():
+    return app.send_static_file('index.html')
 
 @app.route('/token', methods=["POST", "GET"])
 def create_token_user():
