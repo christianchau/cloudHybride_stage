@@ -28,7 +28,7 @@ function Register_b() {
     <div class="container">
     <div class="title">Inscription</div>
     <div class="content">
-      <form method="POST" action="http://127.0.0.1:5000/register">
+      <form method="POST" action="http://cloudhybride-stage.cleverapps.io/register">
         <div class="user-details">
           <div class="input-box">
             <span class="details">Prénom</span>
