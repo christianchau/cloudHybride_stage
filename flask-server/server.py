@@ -1,4 +1,5 @@
-from flask import Flask, request, jsonify, render_template
+from errno import errorcode
+from flask import Flask, request, jsonify,redirect, render_template, abort, flash
 from urllib import response
 from datetime import datetime, timedelta, timezone
 from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, \
@@ -25,7 +26,7 @@ DATABASE = os.getenv('DATABASE')
 DATABASE_USERNAME = os.getenv('DATABASE_USERNAME')
 DATABASE_PASSWORD = os.getenv('DATABASE_PASSWORD')
 """
-app = Flask(__name__, static_folder='../client/build', static_url_path='/')
+app = Flask(__name__, static_folder='../client/build', static_url_path='/', template_folder='../client/build')
 
 # CORS implemented so that we don't get errors when trying to access the server from a different server location
 CORS(app)
@@ -64,7 +65,8 @@ def refresh_expiring_jwts(response):
 
 @app.route("/")
 def index():
-    return app.send_static_file('index.html')
+    return render_template("index.html")
+    """return app.send_static_file('index.html')"""
 
 @app.route('/token', methods=["POST", "GET"])
 def create_token_user():
@@ -72,6 +74,7 @@ def create_token_user():
     password = request.json.get("password", None)
     cursor.execute("SELECT email, password FROM beneficiaire WHERE email='{}'".format(email))
     User = cursor.fetchall()
+    print(User)
     verify_password = ph.verify(User[0][1], password)
     """
     find_email = any(email in sublist for sublist in User)
@@ -120,7 +123,9 @@ def add_user():
         Users = cursor.fetchall()
         find_email = any(email in sublist for sublist in Users)
         if find_email:
-            return 'Email already used !'
+            return abort(401, description="Email already used !")
+            """redirect("Email already used ! Click here to return home !", '/'), 401 """
+            """return 'Email already used !'"""
         if request.method == 'POST':
             data = request.form.to_dict()
             hashed_password = ph.hash(data['password'])
@@ -130,10 +135,13 @@ def add_user():
                 f"{data['email']}", f"{data['password']}", f"{data['firstname']}", f"{data['lastname']}",
                 f"{data['phoneNumber']}", f"{data['dateOfBirth']}", f"{data['gender']}", f"{data['ZipCode']}", f"{data['address']}", f"{data['city']}"))
             conn.commit()
-            return 'User registered' #redirect("", 301)
+            return redirect('/'), 301
         else:
-            return 'Failed to submission'
+            return abort(401, description="Failed to submit !")
 
+@app.route("/error")
+def error():
+    return "You are redirected to Login Page"
 
 
 @app.route("/offre")
