@@ -27,7 +27,7 @@ function Register() {
     <div class="container">
     <div class="title">Inscription Fournisseur</div>
     <div class="content">
-      <form method="POST" action="http://127.0.0.1:5000/register_f">
+      <form method="POST" action="/register_f">
         <div class="user-details">
           <div class="input-box">
             <span class="details">Nom de l'entreprise</span>

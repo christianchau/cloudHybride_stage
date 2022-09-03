@@ -191,7 +191,7 @@ def add_fournisseur():
         Users = cursor.fetchall()
         find_email = any(email in sublist for sublist in Users)
         if find_email:
-            return 'Email already used !'
+            return abort(401, description="Email already used !")
         if request.method == 'POST':
             try:
                 data = request.form.to_dict()
@@ -204,10 +204,9 @@ def add_fournisseur():
                 conn.commit()
             except (Exception, psycopg2.DatabaseError) as error:
                 cursor.execute("ROLLBACK")
-            return 'User registered'
+            return redirect('/'), 301
         else:
-            return 'Failed to submission'
-            #return redirect(url_for('my_profile'))
+            return abort(401, description="Failed to submit !")
 
 @app.route('/token_f', methods=["POST", "GET"])
 def create_token_fournisseur():
@@ -253,7 +252,7 @@ def add_offer():
             f"{offer['name']}", f"{offer['type']}", f"{offer['description']}", f"{offer['dateDebut']}", f"{offer['durée']}",
             f"{offer['address']}", f"{offer['city']}", f"{offer['creditNecessaire']}"))
         conn.commit()
-        return 'Adding offer ...'
+        return redirect('/add_offer'), 301
 
 
 @app.route('/delete_offer', methods=['GET', 'POST'])

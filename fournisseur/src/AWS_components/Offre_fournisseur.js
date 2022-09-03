@@ -39,7 +39,7 @@ const handleClickDelete = event => {
 
 function Add() {
   return (
-    <form method="POST" action="http://127.0.0.1:5000/add_offer">
+    <form method="POST" action="/add_offer">
     <div class="user-details">
       <div class="input-box">
         <span class="details">Intitulé de l'offre</span>
@@ -51,7 +51,7 @@ function Add() {
       </div>
       <div class="input-box">
         <span class="details">Description</span>
-        <textarea type="text" placeholder="Decrivez l'offre" name='description' rows="4" cols="60" required/>
+        <textarea type="text" placeholder="Decrivez l'offre" name='description' rows="4" cols="30" required/>
       </div>
       <div class="input-box">
         <span class="details">Date de début</span>
