@@ -32,15 +32,15 @@ app = Flask(__name__, static_folder='../client/build', static_url_path='/', temp
 # CORS implemented so that we don't get errors when trying to access the server from a different server location
 CORS(app)
 ph = PasswordHasher()
-
+"""
 #Connect to EC2 AWS with port forwarding
 key = paramiko.RSAKey.from_private_key_file('/Users/christian.chau/Downloads/chau_key.pem')
 with SSHTunnelForwarder(
             ('15.236.248.127', 22),
             ssh_username='ubuntu',
             ssh_pkey=key,
-            remote_bind_address=(HOST_AWS, 5432),
-            #local_bind_address=("127.0.0.1", )
+            remote_bind_address=("127.0.0.1", 5432),
+            #local_bind_address=("127.0.0.1", PORT_AWS)
         ) as server:
             
             server.start()
@@ -59,16 +59,18 @@ with SSHTunnelForwarder(
                 database=DATABASE_AWS,
                 user=DATABASE_USERNAME_AWS,
                 password=DATABASE_PASSWORD_AWS,
-                port=PORT_AWS,
+                port=server.local_bind_port,
             )
             
             cursor_aws = conn_aws.cursor()
             print (conn_aws)
             #cursor_aws.execute("SELECT * FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND  schemaname != 'information_schema';")
-            cursor_aws.execute("SELECT * FROM pg_catalog.pg_tables;")
+            #cursor_aws.execute("SELECT * FROM pg_catalog.pg_tables;")
+            #cursor_aws.execute("SELECT nspname FROM pg_catalog.pg_namespace;")
+            cursor_aws.execute("select * from information_schema.tables where table_schema = 'public';")
             #cursor_aws.execute("SELECT * from public.fournisseur;")
             req = cursor_aws.fetchall()
-            print(req)
+            print(req)"""
 """         client = paramiko.SSHClient()
             client.load_system_host_keys()
             client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
