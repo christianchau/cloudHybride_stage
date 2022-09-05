@@ -10,26 +10,124 @@ import secrets
 from dotenv import load_dotenv
 import os
 from argon2 import PasswordHasher
+import paramiko
+from sshtunnel import SSHTunnelForwarder
 
 load_dotenv()
-ph = PasswordHasher()
-
-
 HOST = os.getenv('POSTGRESQL_ADDON_HOST')
 DATABASE = os.getenv('POSTGRESQL_ADDON_DB')
 DATABASE_USERNAME = os.getenv('POSTGRESQL_ADDON_USER')
 DATABASE_PASSWORD = os.getenv('POSTGRESQL_ADDON_PASSWORD')
 PORT = os.getenv('POSTGRESQL_ADDON_PORT')
-"""
-HOST = os.getenv('HOST')
-DATABASE = os.getenv('DATABASE')
-DATABASE_USERNAME = os.getenv('DATABASE_USERNAME')
-DATABASE_PASSWORD = os.getenv('DATABASE_PASSWORD')
-"""
+
+HOST_AWS = os.getenv('HOST_AWS')
+DATABASE_AWS = os.getenv('DATABASE_AWS')
+DATABASE_USERNAME_AWS = os.getenv('DATABASE_USERNAME_AWS')
+DATABASE_PASSWORD_AWS = os.getenv('DATABASE_PASSWORD_AWS')
+PORT_AWS = os.getenv('PORT_AWS')
+
+
 app = Flask(__name__, static_folder='../client/build', static_url_path='/', template_folder='../client/build')
 
 # CORS implemented so that we don't get errors when trying to access the server from a different server location
 CORS(app)
+ph = PasswordHasher()
+
+#Connect to EC2 AWS with port forwarding
+key = paramiko.RSAKey.from_private_key_file('/Users/christian.chau/Downloads/chau_key.pem')
+with SSHTunnelForwarder(
+            ('15.236.248.127', 22),
+            ssh_username='ubuntu',
+            ssh_pkey=key,
+            remote_bind_address=(HOST_AWS, 5432),
+            #local_bind_address=("127.0.0.1", )
+        ) as server:
+            
+            server.start()
+            print ("server connected")
+            client = paramiko.SSHClient()
+            client.load_system_host_keys()
+            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            client.connect(hostname='15.236.248.127',username=server.ssh_username, pkey=key)
+            print ("client connected")
+            stdin, stdout, stderr = client.exec_command('df -h')
+            print(stdout.read().decode())
+
+            conn_aws = psycopg2.connect(
+                #host=server.local_bind_host,
+                host=server.local_bind_host,
+                database=DATABASE_AWS,
+                user=DATABASE_USERNAME_AWS,
+                password=DATABASE_PASSWORD_AWS,
+                port=PORT_AWS,
+            )
+            
+            cursor_aws = conn_aws.cursor()
+            print (conn_aws)
+            #cursor_aws.execute("SELECT * FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND  schemaname != 'information_schema';")
+            cursor_aws.execute("SELECT * FROM pg_catalog.pg_tables;")
+            #cursor_aws.execute("SELECT * from public.fournisseur;")
+            req = cursor_aws.fetchall()
+            print(req)
+"""         client = paramiko.SSHClient()
+            client.load_system_host_keys()
+            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            client.connect(hostname='15.236.248.127',username=server.ssh_username, pkey=key)
+            print ("client connected")
+            stdin, stdout, stderr = client.exec_command('df -h')
+            print(stdout.read().decode())
+            client.close()
+            print("done!")"""
+
+
+"""try:
+    key = paramiko.RSAKey.from_private_key_file('/Users/christian.chau/Downloads/chau_key.pem')
+    with SSHTunnelForwarder(
+            ('15.236.248.127', 22),
+            ssh_username='ubuntu',
+            ssh_pkey=key,
+            remote_bind_address=(HOST_AWS, 5432),
+            local_bind_address=('', )
+        ) as server:
+            
+            server.start()
+            print ("server connected")
+            client = paramiko.SSHClient()
+            client.load_system_host_keys()
+            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            client.connect(hostname='15.236.248.127',username=server.ssh_username, pkey=key)
+            print ("client connected")
+            stdin, stdout, stderr = client.exec_command('df -h')
+            print(stdout.read().decode())
+            client.close()
+            print("done!")
+
+            conn_aws = psycopg2.connect(
+                database=DATABASE_AWS,
+                user=DATABASE_USERNAME_AWS,
+                password=DATABASE_PASSWORD_AWS,
+                host=HOST_AWS,
+                port=PORT_AWS,)
+            cursor_aws = conn_aws.cursor()
+            print (conn_aws)
+            #cursor_aws.execute("SELECT * FROM fournisseur")
+            
+except:
+    print ("Connection Failed")"""
+
+    
+
+"""         conn_aws = psycopg2.connect(
+            database=DATABASE_AWS,
+            user=DATABASE_USERNAME_AWS,
+            password=DATABASE_PASSWORD_AWS,
+            host=server.local_bind_host,
+            port=server.local_bind_port,)
+         cursor_aws = conn_aws.cursor()
+         print (conn_aws)
+         #cursor_aws.execute("SELECT * FROM fournisseur")"""
+
+
 
 conn = psycopg2.connect(
         host=HOST,
@@ -146,8 +244,8 @@ def error():
 
 @app.route("/offre")
 def offre():
-    cursor.execute("SELECT * FROM offre")
-    Offres = cursor.fetchall()
+    cursor_aws.execute("SELECT * FROM offre")
+    Offres = cursor_aws.fetchall()
     print(Offres)
     print("Total rows are:  ", len(Offres))
     for row in Offres:

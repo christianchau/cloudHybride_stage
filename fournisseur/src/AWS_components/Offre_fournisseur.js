@@ -83,7 +83,7 @@ function Add() {
 
 function Modify() {
   return (
-    <form method="POST" action="http://127.0.0.1:5000/modify_offer">
+    <form method="POST" action="/modify_offer">
     <div class="user-details">
       <div class="input-box">
         <span class="details">Intitulé de l'offre</span>
@@ -95,7 +95,7 @@ function Modify() {
       </div>
       <div class="input-box">
         <span class="details">Description</span>
-        <textarea type="text" placeholder="Decrivez l'offre" name='description' rows="4" cols="60" required/>
+        <textarea type="text" placeholder="Decrivez l'offre" name='description' rows="4" cols="30" required/>
       </div>
       <div class="input-box">
         <span class="details">Date du début</span>
@@ -119,7 +119,7 @@ function Modify() {
       </div>
     </div>
     <div class="button">
-      <input type="submit" value="Créer l'offre"/>
+      <input type="submit" value="Supprimer l'offre"/>
     </div>
   </form>
   );
@@ -127,11 +127,8 @@ function Modify() {
 
 function Delete() {
   return (
-    <form method="POST" action="http://127.0.0.1:5000/modify_offer">
+    <form method="POST" action="/delete_offer">
     <div class="user-details">
-      <div class="button">
-      <input type="submit" value="Supprimer l'offre"/>
-      </div>
       <div class="input-box">
         <span class="details">Intitulé de l'offre</span>
         <input type="text" placeholder="Intitulé de l'offre" name="name" required/>
@@ -142,7 +139,7 @@ function Delete() {
       </div>
       <div class="input-box">
         <span class="details">Description</span>
-        <textarea type="text" placeholder="Decrivez l'offre" name='description' rows="4" cols="60" required/>
+        <textarea type="text" placeholder="Decrivez l'offre" name='description' rows="4" cols="30" required/>
       </div>
       <div class="input-box">
         <span class="details">Date du début</span>
@@ -166,7 +163,7 @@ function Delete() {
       </div>
     </div>
     <div class="button">
-      <input type="submit" value="Créer l'offre"/>
+      <input type="submit" value="Supprimer l'offre"/>
     </div>
   </form>
   );
