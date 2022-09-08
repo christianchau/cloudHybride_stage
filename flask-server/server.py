@@ -34,48 +34,6 @@ app = Flask(__name__, static_folder='../client/build', static_url_path='/', temp
 CORS(app)
 ph = PasswordHasher()
 
-#Connect to EC2 AWS with port forwarding
-key = paramiko.RSAKey.from_private_key_file("chau_key.pem")
-with SSHTunnelForwarder(
-            ('15.236.248.127', 22),
-            ssh_username='ubuntu',
-            ssh_pkey=key,
-            remote_bind_address=(HOST_AWS, 5432),
-            local_bind_address=("127.0.0.1",)
-        ) as server:
-            
-            server.start()
-            print ('Server connected via SSH')
-
-            print ("server connected")
-            client = paramiko.SSHClient()
-            client.load_system_host_keys()
-            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            client.connect(hostname='15.236.248.127',username=server.ssh_username, pkey=key)
-            print ("client connected")
-            stdin, stdout, stderr = client.exec_command('ls')
-            print(stdout.read().decode())
-            #client.close()
-            #print ("client close")
-                  
-            #connect to PostgreSQL
-            local_port = str(server.local_bind_port)
-            engine = create_engine('postgresql://postgres:AWSRDSPG123@127.0.0.1:' + local_port +'/postgres')
-
-            Session = sessionmaker(bind=engine)
-            session = Session()
-            
-            print ('Database session created')
-            
-            #test data retrieval
-            test = session.execute("SELECT * FROM offre")
-            for row in test:
-                print (row)
-                
-            session.close()
-
-
-
 conn = psycopg2.connect(
         host=HOST,
         database=DATABASE,
@@ -184,49 +142,53 @@ def add_user():
         else:
             return abort(401, description="Failed to submit !")
 
-@app.route("/error")
-def error():
-    return "You are redirected to Login Page"
-
-
 @app.route("/offre")
 def offre():
-    cursor_aws.execute("SELECT * FROM offre")
-    Offres = cursor_aws.fetchall()
-    print(Offres)
-    print("Total rows are:  ", len(Offres))
-    for row in Offres:
-        print(row)
-        response_body = {
-            "name": row[1],
-            "type" : row[2],
-            "description": row[3],
-            "datedebut": row[4],
-            "duree": row[5],
-            "address": row[8],
-            "ville": row[9],          
-            "prix": row[11]
-        }
-    print(response_body)
-    return response_body
-    """
-    for i in range(len(Offres)):
-        for j in range(len(Offres[i])):
-            Offer = Offres[i][j]
-            print(Offer)
-    return 'hello'
-    response_body = {
-        "name": Offres[0][1],
-        "type" : Offres[0][2],
-        "description": Offres[0][3],
-        "datedebut": Offres[0][4],
-        "duree": Offres[0][5],
-        "address": Offres[0][8],
-        "ville": Offres[0][9],          
-        "prix": Offres[0][11]
-    }
-    return response_body
-    """
+    #Connect to EC2 AWS with port forwarding
+    key = paramiko.RSAKey.from_private_key_file("chau_key.pem")
+    with SSHTunnelForwarder(
+                ('15.236.248.127', 22),
+                ssh_username='ubuntu',
+                ssh_pkey=key,
+                remote_bind_address=(HOST_AWS, 5432),
+                local_bind_address=("127.0.0.1",)
+            ) as server:
+                
+                server.start()
+                print ('Server connected via SSH')
+
+                #connect to PostgreSQL
+                local_port = str(server.local_bind_port)
+                engine = create_engine('postgresql://postgres:AWSRDSPG123@127.0.0.1:' + local_port +'/postgres')
+
+                Session = sessionmaker(bind=engine)
+                session = Session()
+                
+                print ('Database session created')
+                print(session)
+                Offres = session.execute("SELECT * FROM offre")
+                for row in Offres:
+                    print(row)
+                    response_body = {
+                        "name": row[1],
+                        "type" : row[2],
+                        "description": row[3],
+                        "datedebut": row[4],
+                        "duree": row[5],
+                        "address": row[8],
+                        "ville": row[9],          
+                        "prix": row[11]
+                    }
+                print(response_body)
+                return response_body
+"""         client = paramiko.SSHClient()
+            client.load_system_host_keys()
+            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            client.connect(hostname='15.236.248.127',username=server.ssh_username, pkey=key)
+            print ("client connected")
+            stdin, stdout, stderr = client.exec_command('ls')
+            print(stdout.read().decode())
+            client.close()"""
 
 ##### Fournisseur Part #####
 @app.route('/register_f', methods =["GET", "POST"])
