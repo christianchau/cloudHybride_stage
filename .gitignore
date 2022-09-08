@@ -24,6 +24,7 @@ ENV/
 .env.development.local
 .env.test.local
 .env.production.local
+chau_key.pem
 
 __pycache__
 npm-debug.log*
