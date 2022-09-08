@@ -34,6 +34,31 @@ app = Flask(__name__, static_folder='../client/build', static_url_path='/', temp
 CORS(app)
 ph = PasswordHasher()
 
+key = paramiko.RSAKey.from_private_key_file("chau_key.pem")
+with SSHTunnelForwarder(
+                ('15.236.248.127', 22),
+                ssh_username='ubuntu',
+                ssh_pkey=key,
+                remote_bind_address=(HOST_AWS, 5432),
+                local_bind_address=("127.0.0.1",)
+            ) as server:
+                
+                server.start()
+                print ('Server connected via SSH')
+
+                #connect to PostgreSQL
+                local_port = str(server.local_bind_port)
+                engine = create_engine('postgresql://postgres:AWSRDSPG123@127.0.0.1:' + local_port +'/postgres')
+
+                Session = sessionmaker(bind=engine)
+                session = Session()
+                
+                print ('Database session created')
+                print(session)
+                Offres = session.execute("SELECT * FROM offre")
+                for row in Offres:
+                    print(row)
+
 conn = psycopg2.connect(
         host=HOST,
         database=DATABASE,
