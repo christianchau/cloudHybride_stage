@@ -12,6 +12,8 @@ import os
 from argon2 import PasswordHasher
 import paramiko
 from sshtunnel import SSHTunnelForwarder
+from sqlalchemy.orm import sessionmaker #Run pip install sqlalchemy
+from sqlalchemy import create_engine
 
 load_dotenv()
 HOST = os.getenv('POSTGRESQL_ADDON_HOST')
@@ -26,108 +28,51 @@ DATABASE_USERNAME_AWS = os.getenv('DATABASE_USERNAME_AWS')
 DATABASE_PASSWORD_AWS = os.getenv('DATABASE_PASSWORD_AWS')
 PORT_AWS = os.getenv('PORT_AWS')
 
-
 app = Flask(__name__, static_folder='../client/build', static_url_path='/', template_folder='../client/build')
 
 # CORS implemented so that we don't get errors when trying to access the server from a different server location
 CORS(app)
 ph = PasswordHasher()
-"""
+
 #Connect to EC2 AWS with port forwarding
-key = paramiko.RSAKey.from_private_key_file('/Users/christian.chau/Downloads/chau_key.pem')
+key = paramiko.RSAKey.from_private_key_file("chau_key.pem")
 with SSHTunnelForwarder(
             ('15.236.248.127', 22),
             ssh_username='ubuntu',
             ssh_pkey=key,
-            remote_bind_address=("127.0.0.1", 5432),
-            #local_bind_address=("127.0.0.1", PORT_AWS)
-        ) as server:
-            
-            server.start()
-            print ("server connected")
-            client = paramiko.SSHClient()
-            client.load_system_host_keys()
-            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            client.connect(hostname='15.236.248.127',username=server.ssh_username, pkey=key)
-            print ("client connected")
-            stdin, stdout, stderr = client.exec_command('df -h')
-            print(stdout.read().decode())
-
-            conn_aws = psycopg2.connect(
-                #host=server.local_bind_host,
-                host=server.local_bind_host,
-                database=DATABASE_AWS,
-                user=DATABASE_USERNAME_AWS,
-                password=DATABASE_PASSWORD_AWS,
-                port=server.local_bind_port,
-            )
-            
-            cursor_aws = conn_aws.cursor()
-            print (conn_aws)
-            #cursor_aws.execute("SELECT * FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND  schemaname != 'information_schema';")
-            #cursor_aws.execute("SELECT * FROM pg_catalog.pg_tables;")
-            #cursor_aws.execute("SELECT nspname FROM pg_catalog.pg_namespace;")
-            cursor_aws.execute("select * from information_schema.tables where table_schema = 'public';")
-            #cursor_aws.execute("SELECT * from public.fournisseur;")
-            req = cursor_aws.fetchall()
-            print(req)"""
-"""         client = paramiko.SSHClient()
-            client.load_system_host_keys()
-            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            client.connect(hostname='15.236.248.127',username=server.ssh_username, pkey=key)
-            print ("client connected")
-            stdin, stdout, stderr = client.exec_command('df -h')
-            print(stdout.read().decode())
-            client.close()
-            print("done!")"""
-
-
-"""try:
-    key = paramiko.RSAKey.from_private_key_file('/Users/christian.chau/Downloads/chau_key.pem')
-    with SSHTunnelForwarder(
-            ('15.236.248.127', 22),
-            ssh_username='ubuntu',
-            ssh_pkey=key,
             remote_bind_address=(HOST_AWS, 5432),
-            local_bind_address=('', )
+            local_bind_address=("127.0.0.1",)
         ) as server:
             
             server.start()
+            print ('Server connected via SSH')
+
             print ("server connected")
             client = paramiko.SSHClient()
             client.load_system_host_keys()
             client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             client.connect(hostname='15.236.248.127',username=server.ssh_username, pkey=key)
             print ("client connected")
-            stdin, stdout, stderr = client.exec_command('df -h')
+            stdin, stdout, stderr = client.exec_command('ls')
             print(stdout.read().decode())
-            client.close()
-            print("done!")
+            #client.close()
+            #print ("client close")
+                  
+            #connect to PostgreSQL
+            local_port = str(server.local_bind_port)
+            engine = create_engine('postgresql://postgres:AWSRDSPG123@127.0.0.1:' + local_port +'/postgres')
 
-            conn_aws = psycopg2.connect(
-                database=DATABASE_AWS,
-                user=DATABASE_USERNAME_AWS,
-                password=DATABASE_PASSWORD_AWS,
-                host=HOST_AWS,
-                port=PORT_AWS,)
-            cursor_aws = conn_aws.cursor()
-            print (conn_aws)
-            #cursor_aws.execute("SELECT * FROM fournisseur")
+            Session = sessionmaker(bind=engine)
+            session = Session()
             
-except:
-    print ("Connection Failed")"""
-
-    
-
-"""         conn_aws = psycopg2.connect(
-            database=DATABASE_AWS,
-            user=DATABASE_USERNAME_AWS,
-            password=DATABASE_PASSWORD_AWS,
-            host=server.local_bind_host,
-            port=server.local_bind_port,)
-         cursor_aws = conn_aws.cursor()
-         print (conn_aws)
-         #cursor_aws.execute("SELECT * FROM fournisseur")"""
+            print ('Database session created')
+            
+            #test data retrieval
+            test = session.execute("SELECT * FROM offre")
+            for row in test:
+                print (row)
+                
+            session.close()
 
 
 
