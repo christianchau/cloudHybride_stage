@@ -34,7 +34,7 @@ app = Flask(__name__, static_folder='../client/build', static_url_path='/', temp
 CORS(app)
 ph = PasswordHasher()
 
-key = paramiko.RSAKey.from_private_key_file("chau_key.pem")
+"""key = paramiko.RSAKey.from_private_key_file("chau_key.pem")
 with SSHTunnelForwarder(
                 ('15.236.248.127', 22),
                 ssh_username='ubuntu',
@@ -57,7 +57,7 @@ with SSHTunnelForwarder(
                 print(session)
                 Offres = session.execute("SELECT * FROM offre")
                 for row in Offres:
-                    print(row)
+                    print(row)"""
 
 conn = psycopg2.connect(
         host=HOST,
