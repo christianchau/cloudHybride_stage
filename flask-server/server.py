@@ -156,8 +156,7 @@ def add_user():
             """return 'Email already used !'"""
         if request.method == 'POST':
             data = request.form.to_dict()
-            hashed_password = ph.hash(data['password'])
-            data['password'] = hashed_password
+            data['password'] = ph.hash(data['password'])
             print(data)
             cursor.execute("INSERT INTO beneficiaire (email, password, firstName, lastName, phoneNumber, dateOfBirth, civility, ZipCode, address, city) VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(
                 f"{data['email']}", f"{data['password']}", f"{data['firstname']}", f"{data['lastname']}",

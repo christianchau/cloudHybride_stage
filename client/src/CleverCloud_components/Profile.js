@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import axios from "axios";
+import './style/Profile.css';
 
 export default function Profile(props) {
 
@@ -44,7 +45,7 @@ export default function Profile(props) {
   };
 
   return (
-    <div className="Profile">
+    <div className="profile">
         <button onClick={getData}>Information</button>
         {profileData && <div>
               <p>Prénom: {profileData.firstname}</p>
